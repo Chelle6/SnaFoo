@@ -1,21 +1,42 @@
-h1, h2, h3 {
-    font-size: 2.5em;
+body {
+	text-align: center;
+	font: normal medium/1.4 sans-serif;
+	background-color: #eaf2f0;
 }
 
-a {
-    font-size: 2em;
+table {
+	width: 50%;
+	margin-left:auto;
+	margin-right:auto;
+	border-collapse: collapse;
 }
 
-ul {
-    list-style-type: none;
+td, th {
+	border: 1px solid black;
+	padding: 0.5rem;
+	text-align: center;
 }
 
-.hovered {
-    opacity: .6;
+tbody td {
+	background: white;
 }
 
-a {
-    text-decoration: none;
-    color: #33D;
+thead tr:nth-child(odd) {
+	color: #eaf2f0;
+	background: #007d8a;
 }
 
+thead tr:nth-child(even) {
+	color: #373a36;
+	background: #b8c0c1;
+}
+
+button {
+	background-color: #007d8a; /* Green */
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 12px;
+}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content%}
+    <h1>Thanks for voting!</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th># of Votes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for snack in suggestedSnacks %}
+                <tr>
+                    <td>{{ snack.name|capfirst }}</td>
+                    <td>{{ snack.votes }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{% url 'index' %}">Vote Again!</a>
+
+    {% endblock %}

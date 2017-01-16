@@ -6,3 +6,4 @@ class snack(models.Model):
 	purchaseLocations = models.TextField()  # string
 	purchaseCount = models.IntegerField()  # integer
 	lastPurchaseDate = models.TextField()  # string
+	votes = models.IntegerField(default=0)
