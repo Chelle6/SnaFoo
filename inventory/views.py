@@ -58,9 +58,22 @@ def index(request):
 
 def suggestions(request):
 	form = forms.SuggestionForm()
-	# if request.method =='POST':
-	# 	form = forms.SuggestionForm(request.POST)
-	# 	if form.is_valid():
+	if request.method =='POST':  # if you click the suggestion button
+		form = forms.SuggestionForm(request.POST)  # pass data to form model
+		if form.is_valid():
+			result = {
+			    "name": form.cleaned_data['name'],
+			    "location": form.cleaned_data['purchase_locations'],
+			    "lattitude": 43.2,
+			    "lomgitude": -89.5677
+			}
+
+			data = json.dumps(result).encode('utf8')  # convert dictionary to json
+			req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+			response = urllib2.urlopen(req)
+			
+
+			return HttpResponseRedirect(reverse('index'))
 
 	return render(request, 'inventory/suggestions.html', {
 		'form' : form,
