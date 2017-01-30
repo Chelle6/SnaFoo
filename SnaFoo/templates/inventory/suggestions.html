@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+Suggestions
+
+<br>
+
+    <form action="" method="POST">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <input type="submit" value="Suggest" class="button">
+    </form>
+    <br>
+<a href="{% url 'index' %}">Home</a>
+
+{% endblock %}

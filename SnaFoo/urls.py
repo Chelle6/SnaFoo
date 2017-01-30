@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-
 from inventory import views
 
 urlpatterns = [
@@ -24,4 +23,6 @@ urlpatterns = [
     url(r'^results/$', views.results, name='results'),
     url(r'^vote/$', views.vote, name='vote'),
     url(r'^admin/', admin.site.urls),
+    url(r'^suggestions/$', views.suggestions, name='suggestions'),
+    
 ]

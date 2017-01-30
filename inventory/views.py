@@ -3,8 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.core.urlresolvers import reverse
 import json
 from inventory.models import snack
-#import urllib
-# from . import forms
+import urllib
+from . import forms
 try:
 	import urllib.request as urllib2
 except ImportError:
@@ -16,7 +16,7 @@ except ImportError:
 # import requests
 # from django.http import JsonResponse
 
-api_key = '24f93691-f294-4165-b731-660c160b1919'
+api_key = 'f1927cdc-37b5-4e21-a14e-eb23cd93157c'
 url = 'https://api-snacks.nerderylabs.com/v1/snacks?ApiKey=' + api_key
 # json_obj = urllib2.urlopen(url)
 # data = json.loads(json_obj.read())
@@ -38,7 +38,13 @@ def index(request):
 		if not snack.objects.filter(name=item['name']).exists(): # if the object doesn't exist
 			s = snack(name=item['name'], optional=item['optional'], purchaseLocations=item['purchaseLocations'], purchaseCount=item['purchaseCount'], lastPurchaseDate=item['lastPurchaseDate'], id=item['id'])
 			s.save()
-	# votesRemaining = 3
+
+	votesRemaining = 3
+
+	if 'votesRemainingCookie' in request.COOKIES:  # if votesRemainingCookie exists
+		votesRemaining = request.COOKIES['votesRemainingCookie']  # update votesRemaining to cookie value
+
+	request.session['votesRemainingSession'] = votesRemaining
 
 	alwaysPurchasedSnacks = snack.objects.filter(optional=False)
 	suggestedSnacks = snack.objects.filter(optional=True)
@@ -47,7 +53,19 @@ def index(request):
 		#'items': items,
 		'alwaysPurchasedSnacks': alwaysPurchasedSnacks,
 		'suggestedSnacks': suggestedSnacks,
+		'votesRemaining': votesRemaining
 	})
+
+def suggestions(request):
+	form = forms.SuggestionForm()
+	# if request.method =='POST':
+	# 	form = forms.SuggestionForm(request.POST)
+	# 	if form.is_valid():
+
+	return render(request, 'inventory/suggestions.html', {
+		'form' : form,
+	})
+
 
 def results(request):
 	suggestedSnacks = snack.objects.filter(optional=True)
@@ -62,4 +80,11 @@ def vote(request):
 	selected_choice.votes += 1
 	selected_choice.save()
 
-	return HttpResponseRedirect(reverse('results'))
+	votesRemaining = int(request.session.get('votesRemainingSession'))
+	votesRemaining -= 1
+
+	response = HttpResponseRedirect(reverse('results'))
+	response.set_cookie('votesRemainingCookie', votesRemaining)
+	return response
+
+	#return HttpResponseRedirect(reverse('results'))

@@ -1,6 +1,5 @@
 from django.db import models
 
-from django.db import models
 
 class snack(models.Model):
 	name = models.TextField()  # string

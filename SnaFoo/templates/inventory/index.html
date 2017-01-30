@@ -12,7 +12,7 @@
         <tbody>
             <tr>
                 <td><b>Michelle Blanchard</b></td>
-                <td><b>3</b></td>
+                <td><b>{{ votesRemaining }}</b></td>
             </tr>
         </tbody>
     </table>
@@ -58,4 +58,8 @@
 		    </form>
 	    </tbody>
     </table>
+
+    <br>
+    <a href="{% url 'suggestions' %}">Suggest A Snack!</a>
+
 {% endblock %}
