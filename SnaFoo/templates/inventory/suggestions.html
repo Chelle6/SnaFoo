@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if messages %}
+	{% for message in messages %}
+	<p><pre><font color='red'>{{ message|linebreaks}}</font></pre></p>
+	{% endfor %}
+{% endif %}
 
 Suggestions
 

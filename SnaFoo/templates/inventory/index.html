@@ -2,6 +2,12 @@
 
 {% block content %}
     <h1>SnaFoo</h1>
+    {% if messages %}
+        {% for message in messages %}
+        <p><font color='red'>{{ message}}</font></p>
+        {% endfor %}
+    {% endif %}
+
     <table>
         <thead>
             <tr>
@@ -35,7 +41,7 @@
     <table>
         <thead>
             <tr>
-                <th colspan="4">Suggested Snacks</th>
+                <th colspan='4'>Suggested Snacks</th>
             </tr>
             <tr>
                 <th>Name</th>

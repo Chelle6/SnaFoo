@@ -20,7 +20,6 @@ from inventory import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     #url(r'^polls/', include('polls.urls')),
-    url(r'^results/$', views.results, name='results'),
     url(r'^vote/$', views.vote, name='vote'),
     url(r'^admin/', admin.site.urls),
     url(r'^suggestions/$', views.suggestions, name='suggestions'),
