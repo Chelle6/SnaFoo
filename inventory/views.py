@@ -69,34 +69,51 @@ def index(request):
 
 def suggestions(request):
 	form = forms.SuggestionForm()
+	suggestionsRemaining = 5
+	if 'suggestionsRemainingCookie' in request.COOKIES:  # if suggestionsRemainingCookie exists
+		suggestionsRemaining = request.COOKIES['suggestionsRemainingCookie']
+	suggestionsRemaining = int(suggestionsRemaining)
+	if suggestionsRemaining  < 0:
+		suggestionsRemaining = 0
+
 	if request.method =='POST':  # if you click the suggestion button
 		form = forms.SuggestionForm(request.POST)  # pass data to form model
 		if form.is_valid():
-			# result = {
-			#     "name": form.cleaned_data['snack_name'],
-			#     "location": form.cleaned_data['purchase_locations'],
-			#     "lattitude": 43.2,
-			#     "longitude": -89.5677
-			# }
+			if suggestionsRemaining > 0:
 
-			# data = json.dumps(result).encode('utf8')  # convert dictionary to json
-			# req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
-			# response = urllib2.urlopen(req)
-			
+				# result = {
+				#     "name": form.cleaned_data['snack_name'],
+				#     "location": form.cleaned_data['purchase_locations'],
+				#     "lattitude": 43.2,
+				#     "longitude": -89.5677
+				# }
 
-			if not snack.objects.filter(name=form.cleaned_data['snack_name']).exists(): # if the object doesn't exist
-				s = snack(name=form.cleaned_data['snack_name'], optional=True, purchaseLocations=form.cleaned_data['purchase_locations'],
-					purchaseCount=0, lastPurchaseDate='Never Purchased')
-				s.save()
+				# data = json.dumps(result).encode('utf8')  # convert dictionary to json
+				# req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+				# response = urllib2.urlopen(req)
+				
 
-				messages.success(request, 'Your suggestion \'{0}\' has beeen added!'.format(form.cleaned_data['snack_name']))
-				return HttpResponseRedirect(reverse('index'))
+				if not snack.objects.filter(name=form.cleaned_data['snack_name']).exists(): # if the object doesn't exist
+					s = snack(name=form.cleaned_data['snack_name'], optional=True, purchaseLocations=form.cleaned_data['purchase_locations'],
+						purchaseCount=0, lastPurchaseDate='Never Purchased')
+					s.save()
+
+
+					messages.success(request, 'Your suggestion \'{0}\' has beeen added!'.format(form.cleaned_data['snack_name']))
+					suggestionsRemaining = int(suggestionsRemaining)
+					suggestionsRemaining -= 1
+					response = HttpResponseRedirect(reverse('index'))
+					response.set_cookie('suggestionsRemainingCookie', suggestionsRemaining)
+					return response
+
+				else:
+					messages.error(request, '\'{0}\' has already been suggested for this month! <br>Please suggest A new snack'.format(form.cleaned_data['snack_name']))
+					return HttpResponseRedirect(reverse('suggestions'))
 			else:
-				messages.error(request, '\'{0}\' has already been suggested for this month! <br>Please suggest A new snack'.format(form.cleaned_data['snack_name']))
-				return HttpResponseRedirect(reverse('suggestions'))
-
-
-	return render(request, 'inventory/suggestions.html', {	'form' : form,
+				messages.error(request, 'You have no suggestions remaining')
+				return HttpResponseRedirect(reverse('index'))
+	
+	return render(request, 'inventory/suggestions.html', { 'form' : form,'suggestionsRemaining' : suggestionsRemaining ,
 	})
 
 
@@ -116,5 +133,5 @@ def vote(request):
 		
 
 	response = HttpResponseRedirect(reverse('index'))
-	response.set_cookie('votesRemainingCookie', 3)
+	response.set_cookie('votesRemainingCookie', votesRemaining)
 	return response

@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h1>Suggest A Snack!</h1>
+<br>
 {% if messages %}
 	{% for message in messages %}
 	<p><pre><font color='red'>{{ message|linebreaks}}</font></pre></p>
 	{% endfor %}
 {% endif %}
+You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
 
-Suggestions
+
+
 
 <br>
 
