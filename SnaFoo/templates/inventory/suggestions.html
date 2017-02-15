@@ -15,12 +15,22 @@ You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
 
 <br>
 
-    <form action="" method="POST">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <input type="submit" value="Suggest" class="button">
-    </form>
-    <br>
+<form action="" method="POST">
+    {{ dropdownSelectionForm.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Suggest" class="button">
+</form>
+
+<br>
+
+<form action="" method="POST">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Suggest" class="button">
+</form>
+
+<br>
+
 <a href="{% url 'index' %}">Home</a>
 
 {% endblock %}

@@ -69,6 +69,7 @@ def index(request):
 
 def suggestions(request):
 	form = forms.SuggestionForm()
+	dropdownSelectionForm = forms.DropdownSelectionForm()
 	suggestionsRemaining = 5
 	if 'suggestionsRemainingCookie' in request.COOKIES:  # if suggestionsRemainingCookie exists
 		suggestionsRemaining = request.COOKIES['suggestionsRemainingCookie']
@@ -113,7 +114,7 @@ def suggestions(request):
 				messages.error(request, 'You have no suggestions remaining')
 				return HttpResponseRedirect(reverse('index'))
 	
-	return render(request, 'inventory/suggestions.html', { 'form' : form,'suggestionsRemaining' : suggestionsRemaining ,
+	return render(request, 'inventory/suggestions.html', { 'form' : form,'suggestionsRemaining' : suggestionsRemaining, 'dropdownSelectionForm' : dropdownSelectionForm,
 	})
 
 
