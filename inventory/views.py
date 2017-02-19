@@ -68,54 +68,101 @@ def index(request):
 	})
 
 def suggestions(request):
-	form = forms.SuggestionForm()
+	# suggestedSnacks = Snack.objects.filter)optional=True)
+	
+
+
+	#optionalSnacks = []
+
+	
+
+
 	dropdownSelectionForm = forms.DropdownSelectionForm()
+	form = forms.SuggestionForm()
 	suggestionsRemaining = 5
 	if 'suggestionsRemainingCookie' in request.COOKIES:  # if suggestionsRemainingCookie exists
 		suggestionsRemaining = request.COOKIES['suggestionsRemainingCookie']
 	suggestionsRemaining = int(suggestionsRemaining)
-	if suggestionsRemaining  < 0:
+	if suggestionsRemaining < 0:
 		suggestionsRemaining = 0
 
 	if request.method =='POST':  # if you click the suggestion button
+		dropdownSelectionForm = forms.DropdownSelectionForm(request.POST)
 		form = forms.SuggestionForm(request.POST)  # pass data to form model
-		if form.is_valid():
+		
+		if request.POST.get('dropDownSuggestion') and dropdownSelectionForm.is_valid():
+			print('dropDownSuggestion')
 			if suggestionsRemaining > 0:
+				json_obj = urllib2.urlopen(url)  # get json data from Web API
+				data = json.loads(json_obj.read().decode('utf8'))  # convert json data to Python dictionary
+				# print(dropdownSelectionForm['selection'])
+				for item in data:
+					# print(item['id'])
+					
+					if int(item['id']) == int(dropdownSelectionForm.cleaned_data['selection']):
+						s = snack(id=item['id'], name=item['name'], optional=item['optional'],
+							purchaseLocations=item['purchaseLocations'], purchaseCount=item['purchaseCount'],
+							lastPurchaseDate=item['lastPurchaseDate'])
+						if item['lastPurchaseDate'] == None:
+							s.lastPurchaseDate='Never Purchased'
 
-				# result = {
-				#     "name": form.cleaned_data['snack_name'],
-				#     "location": form.cleaned_data['purchase_locations'],
-				#     "lattitude": 43.2,
-				#     "longitude": -89.5677
-				# }
+						s.save()
+						suggestionsRemaining -= 1
 
-				# data = json.dumps(result).encode('utf8')  # convert dictionary to json
-				# req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
-				# response = urllib2.urlopen(req)
-				
-
-				if not snack.objects.filter(name=form.cleaned_data['snack_name']).exists(): # if the object doesn't exist
-					s = snack(name=form.cleaned_data['snack_name'], optional=True, purchaseLocations=form.cleaned_data['purchase_locations'],
-						purchaseCount=0, lastPurchaseDate='Never Purchased')
-					s.save()
-
-
-					messages.success(request, 'Your suggestion \'{0}\' has beeen added!'.format(form.cleaned_data['snack_name']))
-					suggestionsRemaining = int(suggestionsRemaining)
-					suggestionsRemaining -= 1
-					response = HttpResponseRedirect(reverse('index'))
-					response.set_cookie('suggestionsRemainingCookie', suggestionsRemaining)
-					return response
-
-				else:
-					messages.error(request, '\'{0}\' has already been suggested for this month! <br>Please suggest A new snack'.format(form.cleaned_data['snack_name']))
-					return HttpResponseRedirect(reverse('suggestions'))
+						messages.success(request, 'Your Suggestion \'{0}\' has been added!'.format(item['name']))
+						response = HttpResponseRedirect(reverse('index'))
+						response.set_cookie('suggestionsRemainingCookie', suggestionsRemaining)
+						return response
 			else:
-				messages.error(request, 'You have no suggestions remaining')
-				return HttpResponseRedirect(reverse('index'))
-	
-	return render(request, 'inventory/suggestions.html', { 'form' : form,'suggestionsRemaining' : suggestionsRemaining, 'dropdownSelectionForm' : dropdownSelectionForm,
-	})
+				response = HttpResponseRedirect(reverse('suggestions'))
+				messages.error(request, 'You have no more suggestions this month')
+				return response
+
+		elif request.POST.get('formSuggestion'):
+			print('formSuggest')
+
+
+			if form.is_valid():
+				if suggestionsRemaining > 0:
+
+					# result = {
+					#     "name": form.cleaned_data['snack_name'],
+					#     "location": form.cleaned_data['purchase_locations'],
+					#     "lattitude": 43.2,
+					#     "longitude": -89.5677
+					# }
+
+					# data = json.dumps(result).encode('utf8')  # convert dictionary to json
+					# req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+
+					# response = urllib2.urlopen(req)
+					
+
+					if not snack.objects.filter(name=form.cleaned_data['snack_name']).exists(): # if the object doesn't exist
+						s = snack(name=form.cleaned_data['snack_name'], optional=True, purchaseLocations=form.cleaned_data['purchase_locations'],
+							purchaseCount=0, lastPurchaseDate='Never Purchased')
+						s.save()
+
+
+						messages.success(request, 'Your suggestion \'{0}\' has beeen added!'.format(form.cleaned_data['snack_name']))
+						suggestionsRemaining = int(suggestionsRemaining)
+						suggestionsRemaining -= 1
+						response = HttpResponseRedirect(reverse('index'))
+						response.set_cookie('suggestionsRemainingCookie', suggestionsRemaining)
+						return response
+
+					else:
+						messages.error(request, '\'{0}\' has already been suggested for this month! <br>Please suggest A new snack'.format(form.cleaned_data['snack_name']))
+						return HttpResponseRedirect(reverse('suggestions'))
+				else:
+					messages.error(request, 'You have no suggestions remaining')
+					return HttpResponseRedirect(reverse('index'))
+		# else:
+			
+		# 	if dropdownSelectionForm.is_valid():
+		# 		print('click dropdown')
+			#dropdownSelectionForm.save()
+	return render(request, 'inventory/suggestions.html', { 'form' : form,'suggestionsRemaining' : suggestionsRemaining, 'dropdownSelectionForm' : dropdownSelectionForm,})
 
 
 def vote(request):

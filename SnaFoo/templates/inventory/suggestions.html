@@ -11,25 +11,50 @@
 You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
 
 
-
-
 <br>
 
-<form action="" method="POST">
-    {{ dropdownSelectionForm.as_p }}
-    {% csrf_token %}
-    <input type="submit" value="Suggest" class="button">
-</form>
 
-<br>
+    <table>
+        <thead>
+        	<tr>
+        		<th>Suggest an optional snack</th>
+            </tr>
+            <tr>
+                <th>
+        
+				<form action="" method="POST">
+				    {{ dropdownSelectionForm.as_p }}
+				    {% csrf_token %}
+				    <input type="submit" value="Suggest" name="dropDownSuggestion" class="button">
+				</form>
+				</th>
+			</tr>
+        </thead>
+	</table>
 
-<form action="" method="POST">
-    {{ form.as_p }}
-    {% csrf_token %}
-    <input type="submit" value="Suggest" class="button">
-</form>
+		<br></ br>
+		<p>or</p>
 
-<br>
+	<table>
+        <thead>
+        	<tr>
+        		<th>Suggest a new snack</th>
+            </tr>
+            <tr>
+                <th>
+
+			<form action="" method="POST">
+			    {{ form.as_p }}
+			    {% csrf_token %}
+			    <input type="submit" value="Suggest" name="formSuggestion" class="button">
+			</form>
+			    
+			</th>
+			</tr>
+        </thead>
+	</table>
+
+</br>
 
 <a href="{% url 'index' %}">Home</a>
 

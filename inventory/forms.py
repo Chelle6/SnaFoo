@@ -18,15 +18,15 @@ def get_my_choices():
 		if item['optional'] == True:
 
 
-			optionalSnack = (item['id'], item['name'])
+			optionalSnack = (item['id'], item['name']) # tuple
 			my_choices.append(optionalSnack)
 
 	return my_choices
 
 
 class SuggestionForm(forms.Form):
-    snack_name = forms.CharField(max_length=200)
-    purchase_locations = forms.CharField(widget=forms.Textarea, max_length=50)
+    snack_name = forms.CharField(max_length=200, required=False)
+    purchase_locations = forms.CharField(widget=forms.Textarea, max_length=50, required=False)
 
 
 class DropdownSelectionForm(forms.Form):
