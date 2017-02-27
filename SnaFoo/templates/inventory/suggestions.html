@@ -1,27 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Suggest A Snack!</h1>
-<br>
-{% if messages %}
-	{% for message in messages %}
-	<p><pre><font color='red'>{{ message|linebreaks}}</font></pre></p>
-	{% endfor %}
-{% endif %}
-You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
+	<h1>Suggest A Snack!</h1>
+	<br>
+	{% if messages %}
+		{% for message in messages %}
+		<p><pre><font color='red'>{{ message|linebreaks}}</font></pre></p>
+		{% endfor %}
+	{% endif %}
+	{% if suggestionsRemaining == 1 %}
+	    You have <b>{{ suggestionsRemaining }}</b> suggestion remaining this month.
+	{% else %}
+		You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month.
+	{% endif %}
+	<br>
+	{% if choiceCount > 0 %}
 
-
-<br>
-
-
-    <table>
-        <thead>
-        	<tr>
-        		<th>Suggest an optional snack</th>
-            </tr>
-            <tr>
-                <th>
-        
+	<br>
+	<table>
+	    <thead>
+	    	<tr>
+	    		<th>Suggest an optional snack</th>
+	        </tr>
+	        <tr>
+	            <th>
+	    
 				<form action="" method="POST">
 				    {{ dropdownSelectionForm.as_p }}
 				    {% csrf_token %}
@@ -29,19 +32,22 @@ You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
 				</form>
 				</th>
 			</tr>
-        </thead>
+	    </thead>
 	</table>
 
-		<br></ br>
-		<p>or</p>
+	<br>
+	<p>or</p>
+	{% else %}
+	<p><font color='blue'>All optional snacks this month have been suggested.<br>Please suggest a new snack!</p></font></p>
+	{% endif %}
 
 	<table>
-        <thead>
-        	<tr>
-        		<th>Suggest a new snack</th>
-            </tr>
-            <tr>
-                <th>
+	    <thead>
+	    	<tr>
+	    		<th>Suggest a new snack</th>
+	        </tr>
+	        <tr>
+	            <th>
 
 			<form action="" method="POST">
 			    {{ form.as_p }}
@@ -51,11 +57,11 @@ You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month
 			    
 			</th>
 			</tr>
-        </thead>
+	    </thead>
 	</table>
 
-</br>
+	<br>
 
-<a href="{% url 'index' %}">Home</a>
+	<a href="{% url 'index' %}">Home</a>
 
 {% endblock %}
