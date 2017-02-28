@@ -14,8 +14,9 @@ def get_optional_snacks():
     optional_snacks = []
 
     # Retrieve all snacks from Web service
-    from inventory.views import load_json
-    data = load_json()
+    from inventory.views import get_url
+    json_obj = urllib2.urlopen(get_url())
+    data = json.loads(json_obj.read())
 
     # If optional snacks don't exist in db, add snack to dropdown
     for item in data:
