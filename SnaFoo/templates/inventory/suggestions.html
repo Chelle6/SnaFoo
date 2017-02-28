@@ -5,7 +5,7 @@
 	<br>
 	{% if messages %}
 		{% for message in messages %}
-		<p><pre><font color='red'>{{ message|linebreaks}}</font></pre></p>
+		<p><font color='red'>{{ message|linebreaks }}</font></p>
 		{% endfor %}
 	{% endif %}
 	{% if suggestionsRemaining == 1 %}

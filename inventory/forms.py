@@ -4,27 +4,30 @@ import json
 import urllib
 
 try:
-	import urllib.request as urllib2
+    import urllib.request as urllib2
 except ImportError:
-	import urllib2
+    import urllib2
 
 
-def get_my_choices():
-	my_choices = []
-	from inventory.views import loadJSON
-	data = loadJSON()
-	# api_key = 'f1927cdc-37b5-4e21-a14e-eb23cd93157c'
-	# url = 'https://api-snacks.nerderylabs.com/v1/snacks?ApiKey=' + api_key
-	# json_obj = urllib2.urlopen(url) # get json data from Web API
-	# data = json.loads(json_obj.read().decode('utf8'))  # convert json data to Python dictionary
-	
-	for item in data:
-		if item['optional'] == True and not snack.objects.filter(id=item['id']).exists(): # optional snack returned from json
+def get_optional_snacks():
+    """Retrieve list of optional snacks to populate the dropdown"""
+    optional_snacks = []
 
-			optionalSnack = (item['id'], item['name']) # tuple
-			my_choices.append(optionalSnack)
+    # Retrieve all snacks from Web service
+    from inventory.views import load_json
+    data = load_json()
 
-	return my_choices
+    # If optional snacks don't exist in db, add snack to dropdown
+    for item in data:
+        if (
+            item['optional'] and
+            not snack.objects.filter(id=item['id']).exists()
+        ):
+
+            optional_snack = (item['id'], item['name'])
+            optional_snacks.append(optional_snack)
+
+    return optional_snacks
 
 
 class SuggestionForm(forms.Form):
@@ -33,4 +36,8 @@ class SuggestionForm(forms.Form):
 
 
 class DropdownSelectionForm(forms.Form):
-	selection = forms.ChoiceField(choices=get_my_choices, widget=forms.Select, required=False)
+    selection = forms.ChoiceField(
+        choices=get_optional_snacks,
+        widget=forms.Select,
+        required=False,
+    )
