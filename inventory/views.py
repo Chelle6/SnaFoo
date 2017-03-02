@@ -15,6 +15,7 @@ except ImportError:
 error_msg = '<p>The server in undergoing maintenance. \
 Please check back later</p>'
 
+
 # Return URL of Nerdery webservice
 def get_url():
     api_key = 'f1927cdc-37b5-4e21-a14e-eb23cd93157c'
@@ -55,10 +56,6 @@ def index(request):
             'votesRemaining': votesRemaining
         })
 
-    # else:
-    #     # if valid JSON data wasn't received, handle error
-    #     handle_error()
-
 
 def suggestions(request):
     # Retrieve snack item data
@@ -68,6 +65,8 @@ def suggestions(request):
     except urllib2.HTTPError:
         return HttpResponse(error_msg)
     else:
+        data = json.loads(json_obj.read())
+
         # Retrieve forms
         dropdownSelectionForm = forms.DropdownSelectionForm()
         form = forms.SuggestionForm()
