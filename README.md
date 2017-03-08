@@ -29,13 +29,13 @@ Error handling is also implemented to handle all possible failure occurences, is
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Django](http://www.djangoproject.com/) - The web framework used
+* [Python](https://python.org/) - The development language used
+* [Subime Text](https://sublimetext.api/) - The code editor used
 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Michelle Blanchard** - *Public code repos* - [Chelle6](https://github.com/Chelle6)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
