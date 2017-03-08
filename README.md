@@ -5,15 +5,15 @@ A web application built in Python using the Django framework that allows employe
 ## Screen Shots
 
 ![votepage_vote_added](https://cloud.githubusercontent.com/assets/12975254/23692389/ceb02072-0393-11e7-9c52-6048bd2b1551.png)
-<center>Employee has voted on a snack</center>
+<p align="center">Employee has voted on a snack</p><br />
 
 
 ![votepage_sugestion_added](https://cloud.githubusercontent.com/assets/12975254/23692478/96755712-0394-11e7-8f8c-3a9dc375df6d.png)
-<center>Employee has suggested a snack</center>
+<p align="center">Employee has suggested a snack</p><br />
 
 
 ![suggestionspage_dropdown](https://cloud.githubusercontent.com/assets/12975254/23692584/3d80d108-0395-11e7-99fc-90c11d0492fd.png)
-<center>Employee selects a snack from dropdown</center>
+<p align="center">Employee selects a snack from dropdown</p><br />
 
 
 ### Technical Specifications
