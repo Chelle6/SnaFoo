@@ -31,7 +31,7 @@ Error handling is also implemented to handle all possible failure occurences, is
 
 * [Django](http://www.djangoproject.com/) - The web framework used
 * [Python](https://python.org/) - The development language used
-* [Subime Text](https://sublimetext.api/) - The code editor used
+* [Sublime Text](https://sublimetext.api/) - The code editor used
 
 
 ## Authors
