@@ -18,7 +18,7 @@ A web application built in Python using the Django framework that allows employe
 
 ### Technical Specifications
 
-SnaFoo was built using the Django Framework 1.10.4 running Python 2.7.10.  
+SnaFoo was built using the Django framework 1.10.4 running Python 2.7.10.  
 
 #### Voting
 
