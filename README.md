@@ -18,14 +18,36 @@ A web application built in Python using the Django framework that allows employe
 
 ### Technical Specifications
 
-SnaFoo was built using the Django Framework 1.10.4 running Python 2.7.10.  Optional and always purchased snacks are retrieved from a web service API, packaged as JSON, and parsed by the SnaFoo application.  When a user suggests a snack, either one of their own, or from a Dropdown listing optional snacks returned by the web service, the snack objects are added to a database and initialized to start voting on upon creation.  Django forms are used for suggesting snacks, and the number of snacks an employee can suggest are stored as Python cookie objects.  When a user suggests a snack, the snack item is also added to the web service via and API call formatting the data JSON encoding.  
+SnaFoo was built using the Django Framework 1.10.4 running Python 2.7.10.  
 
-The voting page retrieves a list of always purchased snacks from the web services and allows employees to vote on snacks which have been suggested for the month.  Logic is implemented to ensure no duplicate snacks have been suggested.  When a user has suggested a snack, the snack's vote count gets updated accordingly along with the number of votes the employee has remaining.
+#### Voting
 
-Error handling is also implemented to handle all possible failure occurences, issues such as server maintenance, and instances of when an employee is out of votes remaining or has used their alloted amount of suggestions for the month.
+The Voting page shows the snacks currently being purchased or suggested for purchase for the coming month. This consist of two separate lists: those that are always purchased and those that have been suggested so far this month by employees. Each of the suggestions display the current number of votes for that snack this month and the last time the snack was purchased.
 
+Each suggestion has a vote button that allows an employee to vote for a snack. Once an employee's vote has been entered, the employee cannot change their vote.  Employees vote for up to 3 snacks per month. The number of votes remaining for the employee is displayed on the page. If an employee attempts to vote more than 3 times, an error message is displayed indicating that they may not vote until the next month.
 
+Django cookies are used to track whether an employee has used their maximum number of votes.
 
+#### Suggestions
+
+The Suggestions page displays a dropdown from which an employee may select a snack to add to the list of suggested snacks for the month. The source for the items in this menu is set of optional snacks returned by a web service.  This dropdown does not include snacks which are always purchased or snacks which have already been suggested for the month.
+There is a Django form that allows an employee to suggest a snack and where it can be purchased if their preferred snack is not listed in the dropdown.  Employee suggestions can be added via a web service as optional snacks for future consideration.
+
+An employee can choose one snack from the list or enter a new snack, not both, per month. 
+
+Once the employee chooses or enters their suggestion, they click the Suggest button to record their suggestion. The application does not allow duplicate suggestions, and form validation ensures that the user has entered all required data when making their suggestion. Error messages are also displayed if an employee attempts to make more than 3 of suggestions per month.
+
+#### Web Service
+
+A web service API is used to retrieve the current list of snack foods, some of which are always purchased and some of which are optional.  The API stores this data in JSON format along with additional parameters including how many times that snack has been purchased in the past, where the snack can be purchased, and the last date that the snack was purchased.
+
+The web service also offers the ability to create a new snack entry.
+
+The application validates data retrieved from the service and handles server errors appropriately.
+
+#### Coding Style
+
+The application follows PEP8 code style; HTML 5 was used with the site design.
 
 ## Built With
 
