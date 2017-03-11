@@ -35,7 +35,7 @@ There is a Django form that allows an employee to suggest a snack and where it c
 
 An employee can choose one snack from the list or enter a new snack, not both, per month. 
 
-Once the employee chooses or enters their suggestion, they click the Suggest button to record their suggestion. The application does not allow duplicate suggestions, and form validation ensures that the user has entered all required data when making their suggestion. Error messages are also displayed if an employee attempts to make more than 3 of suggestions per month.
+Once the employee chooses or enters their suggestion, they click the Suggest button to record their suggestion. The application does not allow duplicate suggestions, and form validation ensures that the user has entered all required data when making their suggestion. Error messages are also displayed if an employee attempts to make more than 3 suggestions per month.
 
 #### Web Service
 
