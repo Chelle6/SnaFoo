@@ -74,10 +74,10 @@ def suggestions(request):
         # Initalize suggestions remaining count, retrieve cookie data
         suggestionsRemaining = 1
 
-        if 'suggestionsRemainingCookie' in request.COOKIES:
-            suggestionsRemaining = int(
-                request.COOKIES['suggestionsRemainingCookie']
-            )
+        # if 'suggestionsRemainingCookie' in request.COOKIES:
+        #     suggestionsRemaining = int(
+        #         request.COOKIES['suggestionsRemainingCookie']
+        #     )
 
         if suggestionsRemaining < 0:
             suggestionsRemaining = 0
@@ -141,14 +141,19 @@ def suggestions(request):
 
                         # Add suggested snack to Web service
                         result = {
-                            "name": form.cleaned_data['snack_name'],
-                            "location": form.cleaned_data['purchase_locations'],
-                            "lattitude": 43.2,
+                            "name":
+                                form.cleaned_data['snack_name'],
+                            "location":
+                                form.cleaned_data['purchase_locations'],
+                            "latitude": 43.2,
                             "longitude": -89.5677
                         }
 
                         data = json.dumps(result).encode('utf8')
-                        req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+                        url = get_url()
+                        req = urllib2.Request(
+                            url, data, {'Content-Type': 'application/json'}
+                        )
                         response = urllib2.urlopen(req)
 
                         # Add suggested snack to db if it doesn't exist
@@ -230,3 +235,4 @@ def vote(request):
     response = HttpResponseRedirect(reverse('index'))
     response.set_cookie('votesRemainingCookie', votesRemaining)
     return response
+
