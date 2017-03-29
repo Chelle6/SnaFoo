@@ -18,7 +18,7 @@
         <tbody>
             <tr>
                 <td><b>Michelle Blanchard</b></td>
-                <td><b>{{ votesRemaining }}</b></td>
+                <td><b>{{ votes_remaining }}</b></td>
             </tr>
         </tbody>
     </table>
@@ -30,7 +30,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for snack in alwaysPurchasedSnacks %}
+            {% for snack in always_purchased_snacks %}
                 <tr>
                     <td>{{ snack.name|capfirst }}</td>
                 </tr>
@@ -53,7 +53,7 @@
         <tbody>
 	        <form action="{% url 'vote' %}" method="post">
 	        {% csrf_token %}
-            {% for snack in suggestedSnacks %}
+            {% for snack in suggested_snacks %}
                 <tr>
                     <td>{{ snack.name|capfirst }}</td>
 		            <td>{{ snack.votes }}</td>

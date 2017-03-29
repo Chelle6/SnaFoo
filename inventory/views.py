@@ -6,6 +6,7 @@ from inventory.models import snack
 from django.contrib import messages
 import urllib
 from . import forms
+from inventory.forms import get_optional_snacks
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -32,28 +33,28 @@ def index(request):
         data = json.loads(json_obj.read())
 
         # Iterate through snack data, retrieving always purchased snacks
-        alwaysPurchasedSnacks = []
+        always_purchased_snacks = []
 
         for item in data:
 
             if not item['optional']:
-                alwaysPurchasedSnacks.append(item)
+                always_purchased_snacks.append(item)
 
         # Initalize vote count, retrieve cookie data, create session variables
-        votesRemaining = 3
+        votes_remaining = 3
 
-        if 'votesRemainingCookie' in request.COOKIES:
-            votesRemaining = request.COOKIES['votesRemainingCookie']
+        if 'votes_remaining_cookie' in request.COOKIES:
+            votes_remaining = request.COOKIES['votes_remaining_cookie']
 
-        request.session['votesRemainingSession'] = votesRemaining
+        request.session['votes_remaining_session'] = votes_remaining
 
-        suggestedSnacks = snack.objects.filter(optional=True)
+        suggested_snacks = snack.objects.filter(optional=True)
 
         # Render index view, pass voting and snack data to populate tables
         return render(request, 'inventory/index.html', {
-            'alwaysPurchasedSnacks': alwaysPurchasedSnacks,
-            'suggestedSnacks': suggestedSnacks,
-            'votesRemaining': votesRemaining
+            'always_purchased_snacks': always_purchased_snacks,
+            'suggested_snacks': suggested_snacks,
+            'votes_remaining': votes_remaining
         })
 
 
@@ -68,38 +69,40 @@ def suggestions(request):
         data = json.loads(json_obj.read())
 
         # Retrieve forms
-        dropdownSelectionForm = forms.DropdownSelectionForm()
+        dropdown_selection_form = forms.DropdownSelectionForm()
         form = forms.SuggestionForm()
 
         # Initalize suggestions remaining count, retrieve cookie data
-        suggestionsRemaining = 1
+        suggestions_remaining = 1
 
-        # if 'suggestionsRemainingCookie' in request.COOKIES:
-        #     suggestionsRemaining = int(
-        #         request.COOKIES['suggestionsRemainingCookie']
+        # if 'suggestions_remaining_cookie' in request.COOKIES:
+        #     suggestions_remaining = int(
+        #         request.COOKIES['suggestions_remaining_cookie']
         #     )
 
-        if suggestionsRemaining < 0:
-            suggestionsRemaining = 0
+        if suggestions_remaining < 0:
+            suggestions_remaining = 0
 
         if request.method == 'POST':  # If user clicks the suggestion button
-            dropdownSelectionForm = forms.DropdownSelectionForm(request.POST)
+            dropdown_selection_form = forms.DropdownSelectionForm(request.POST)
             form = forms.SuggestionForm(request.POST)
 
             # When user selects dropdown item, check votes remaining
             if (
-                request.POST.get('dropDownSuggestion') and
-                dropdownSelectionForm.is_valid()
+                request.POST.get('dropdown_suggestion') and
+                dropdown_selection_form.is_valid()
             ):
 
-                if suggestionsRemaining > 0:
+                if suggestions_remaining > 0:
                     # Add selection to db
                     for item in data:
-                        ddIem = dropdownSelectionForm.cleaned_data['selection']
+                        dropdown_item = (
+                            dropdown_selection_form.cleaned_data['selection']
+                        )
 
                         if (
                             int(item['id']) == (
-                                int(ddIem)
+                                int(dropdown_item)
                             )
                         ):
                             s = snack(
@@ -115,14 +118,14 @@ def suggestions(request):
                             s.save()
 
                             # decrement suggestions remaining, update cookie
-                            suggestionsRemaining -= 1
+                            suggestions_remaining -= 1
                             msg = 'Your suggestion \'{0}\' ' \
                                 'has been added!'.format(item['name'])
                             messages.success(request, msg)
                             response = HttpResponseRedirect(reverse('index'))
                             response.set_cookie(
-                                'suggestionsRemainingCookie',
-                                suggestionsRemaining,
+                                'suggestions_remaining_cookie',
+                                suggestions_remaining,
                             )
                             return response
                 else:
@@ -137,7 +140,7 @@ def suggestions(request):
             elif request.POST.get('formSuggestion'):
 
                 if form.is_valid():
-                    if suggestionsRemaining > 0:
+                    if suggestions_remaining > 0:
 
                         # Add suggested snack to Web service
                         result = {
@@ -176,11 +179,11 @@ def suggestions(request):
                             messages.success(request, msg)
 
                             # Decrement suggestions remaining, update cookie
-                            suggestionsRemaining -= 1
+                            suggestions_remaining -= 1
                             response = HttpResponseRedirect(reverse('index'))
                             response.set_cookie(
-                                'suggestionsRemainingCookie',
-                                suggestionsRemaining,
+                                'suggestions_remaining_cookie',
+                                suggestions_remaining,
                             )
                             return response
 
@@ -202,25 +205,24 @@ def suggestions(request):
                         return HttpResponseRedirect(reverse('index'))
 
         # Retrieve number of optional snacks
-        from inventory.forms import get_optional_snacks
         choiceCount = len(get_optional_snacks())
 
         # Render index view, pass voting and snack data to populate tables
         return render(request, 'inventory/suggestions.html', {
             'form': form,
-            'suggestionsRemaining': suggestionsRemaining,
-            'dropdownSelectionForm': dropdownSelectionForm,
+            'suggestions_remaining': suggestions_remaining,
+            'dropdown_selection_form': dropdown_selection_form,
             'choiceCount': choiceCount,
             })
 
 
 def vote(request):
     # Retrieve votes remaining session variable
-    votesRemaining = int(request.session.get('votesRemainingSession'))
+    votes_remaining = int(request.session.get('votes_remaining_session'))
 
     # Increment vote count for selected item if votes remain, update cookie
-    if votesRemaining > 0:
-        votesRemaining -= 1
+    if votes_remaining > 0:
+        votes_remaining -= 1
 
         selected_choice = snack.objects.get(id=request.POST['snack'])
         selected_choice.votes += 1
@@ -229,10 +231,9 @@ def vote(request):
         messages.success(request, 'Your vote has beeen added!')
 
     else:
-        votesRemaining = 0
+        votes_remaining = 0
         messages.error(request, 'You have used all of your votes this month')
 
     response = HttpResponseRedirect(reverse('index'))
-    response.set_cookie('votesRemainingCookie', votesRemaining)
+    response.set_cookie('votes_remaining_cookie', votes_remaining)
     return response
-

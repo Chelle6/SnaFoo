@@ -8,10 +8,10 @@
 		<p><font color='red'>{{ message|linebreaks }}</font></p>
 		{% endfor %}
 	{% endif %}
-	{% if suggestionsRemaining == 1 %}
-	    You have <b>{{ suggestionsRemaining }}</b> suggestion remaining this month.
+	{% if suggestions_remaining == 1 %}
+	    You have <b>{{ suggestions_remaining }}</b> suggestion remaining this month.
 	{% else %}
-		You have <b>{{ suggestionsRemaining }}</b> suggestions remaining this month.
+		You have <b>{{ suggestions_remaining }}</b> suggestions remaining this month.
 	{% endif %}
 	<br>
 	{% if choiceCount > 0 %}
@@ -26,9 +26,9 @@
 	            <th>
 	    
 				<form action="" method="POST">
-				    {{ dropdownSelectionForm.as_p }}
+				    {{ dropdown_selection_form.as_p }}
 				    {% csrf_token %}
-				    <input type="submit" value="Suggest" name="dropDownSuggestion" class="button">
+				    <input type="submit" value="Suggest" name="dropdown_suggestion" class="button">
 				</form>
 				</th>
 			</tr>
