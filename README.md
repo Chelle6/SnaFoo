@@ -59,5 +59,3 @@ The application follows PEP8 code style; HTML 5 was used with the site design.
 ## Authors
 
 * **Michelle Blanchard** - *Public code repos* - [Chelle6](https://github.com/Chelle6)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
