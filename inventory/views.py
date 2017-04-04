@@ -16,6 +16,7 @@ except ImportError:
 error_msg = '<p>The server in undergoing maintenance. \
 Please check back later</p>'
 
+suggestions_remaining = 1
 
 # Return URL of Nerdery webservice
 def get_url():
@@ -58,7 +59,111 @@ def index(request):
         })
 
 
+def handle_dropdown(data, dropdown_selection_form, request):
+    global suggestions_remaining
+
+    # Add selection to db
+    for item in data:
+        dropdown_item = (
+            dropdown_selection_form.cleaned_data['selection']
+        )
+
+        if (
+            int(item['id']) == (
+                int(dropdown_item)
+            )
+        ):
+            s = snack(
+                id=item['id'], name=item['name'],
+                optional=item['optional'],
+                purchaseLocations=item['purchaseLocations'],
+                purchaseCount=item['purchaseCount'],
+                lastPurchaseDate=item['lastPurchaseDate'],
+            )
+            if item['lastPurchaseDate'] is None:
+                s.lastPurchaseDate = 'Never Purchased'
+
+            s.save()
+
+            # decrement suggestions remaining, update cookie
+            suggestions_remaining -= 1
+            msg = 'Your suggestion \'{0}\' ' \
+                'has been added!'.format(item['name'])
+            messages.success(request, msg)
+            response = HttpResponseRedirect(reverse('index'))
+            response.set_cookie(
+                'suggestions_remaining_cookie',
+                suggestions_remaining,
+            )
+            return response
+    
+
+def handle_suggestion_form(form, request):
+    global suggestions_remaining
+
+    # Add suggested snack to Web service
+    result = {
+        "name":
+            form.cleaned_data['snack_name'],
+        "location":
+            form.cleaned_data['purchase_locations'],
+        "latitude": 43.2,
+        "longitude": -89.5677
+    }
+
+    # data = json.dumps(result).encode('utf8')
+    # url = get_url()
+    # req = urllib2.Request(
+    #     url, data, {'Content-Type': 'application/json'}
+    # )
+    # response = urllib2.urlopen(req)
+
+    # Add suggested snack to db if it doesn't exist
+    if not snack.objects.filter(
+        name=form.cleaned_data['snack_name'],
+    ).exists():
+        s = snack(
+            name=form.cleaned_data['snack_name'],
+            optional=True,
+            purchaseLocations=(
+                form.cleaned_data['purchase_locations'],
+            ),
+            purchaseCount=0,
+            lastPurchaseDate='Never Purchased',
+        )
+        s.save()
+        msg = 'Your suggestion \'{0}\' has beeen added!'\
+            .format(form.cleaned_data['snack_name'])
+
+        messages.success(request, msg)
+
+        # Decrement suggestions remaining, update cookie
+        suggestions_remaining -= 1
+        response = HttpResponseRedirect(reverse('index'))
+        response.set_cookie(
+            'suggestions_remaining_cookie',
+            suggestions_remaining,
+        )
+        return response
+
+    else:
+        # Handle case where snack is already suggested
+        msg = '\'{0}\' has already been suggested '\
+            'for this month.\n'\
+            'Please suggest a new snack!'\
+            .format(form.cleaned_data['snack_name'])
+
+        messages.error(request, msg)
+        return HttpResponseRedirect(reverse('suggestions'))
+
+
 def suggestions(request):
+    global suggestions_remaining
+    # if 'suggestions_remaining_cookie' in request.COOKIES:
+    #     suggestions_remaining = int(
+    #         request.COOKIES['suggestions_remaining_cookie']
+    #     )
+
     # Retrieve snack item data
     # Get json data from Web API, convert data to Python dictionary if valid
     try:
@@ -72,138 +177,35 @@ def suggestions(request):
         dropdown_selection_form = forms.DropdownSelectionForm()
         form = forms.SuggestionForm()
 
-        # Initalize suggestions remaining count, retrieve cookie data
-        suggestions_remaining = 1
-
-        # if 'suggestions_remaining_cookie' in request.COOKIES:
-        #     suggestions_remaining = int(
-        #         request.COOKIES['suggestions_remaining_cookie']
-        #     )
-
-        if suggestions_remaining < 0:
-            suggestions_remaining = 0
-
         if request.method == 'POST':  # If user clicks the suggestion button
-            dropdown_selection_form = forms.DropdownSelectionForm(request.POST)
-            form = forms.SuggestionForm(request.POST)
 
-            # When user selects dropdown item, check votes remaining
-            if (
-                request.POST.get('dropdown_suggestion') and
-                dropdown_selection_form.is_valid()
-            ):
+            if suggestions_remaining <= 0:
+                suggestions_remaining = 0
+                messages.error(
+                    request, 'You have no more suggestions this month',
+                )
+                return HttpResponseRedirect(reverse('index'))
+            
+            else:
 
-                if suggestions_remaining > 0:
-                    # Add selection to db
-                    for item in data:
-                        dropdown_item = (
-                            dropdown_selection_form.cleaned_data['selection']
-                        )
+                dropdown_selection_form = forms.DropdownSelectionForm(request.POST)
+                form = forms.SuggestionForm(request.POST)
 
-                        if (
-                            int(item['id']) == (
-                                int(dropdown_item)
-                            )
-                        ):
-                            s = snack(
-                                id=item['id'], name=item['name'],
-                                optional=item['optional'],
-                                purchaseLocations=item['purchaseLocations'],
-                                purchaseCount=item['purchaseCount'],
-                                lastPurchaseDate=item['lastPurchaseDate'],
-                            )
-                            if item['lastPurchaseDate'] is None:
-                                s.lastPurchaseDate = 'Never Purchased'
+                # When user selects dropdown item, check votes remaining
+                if (
+                    request.POST.get('dropdown_suggestion') and
+                    dropdown_selection_form.is_valid()
+                ):
+                    return handle_dropdown(data, dropdown_selection_form, request)
 
-                            s.save()
-
-                            # decrement suggestions remaining, update cookie
-                            suggestions_remaining -= 1
-                            msg = 'Your suggestion \'{0}\' ' \
-                                'has been added!'.format(item['name'])
-                            messages.success(request, msg)
-                            response = HttpResponseRedirect(reverse('index'))
-                            response.set_cookie(
-                                'suggestions_remaining_cookie',
-                                suggestions_remaining,
-                            )
-                            return response
-                else:
-                    # Handles case where user has no suggestions remaining
-                    response = HttpResponseRedirect(reverse('index'))
-                    messages.error(
-                        request, 'You have no more suggestions this month',
-                    )
-                    return response
-
-            # Handle 'suggest a new snack' form
-            elif request.POST.get('formSuggestion'):
-
-                if form.is_valid():
-                    if suggestions_remaining > 0:
-
-                        # Add suggested snack to Web service
-                        result = {
-                            "name":
-                                form.cleaned_data['snack_name'],
-                            "location":
-                                form.cleaned_data['purchase_locations'],
-                            "latitude": 43.2,
-                            "longitude": -89.5677
-                        }
-
-                        data = json.dumps(result).encode('utf8')
-                        url = get_url()
-                        req = urllib2.Request(
-                            url, data, {'Content-Type': 'application/json'}
-                        )
-                        response = urllib2.urlopen(req)
-
-                        # Add suggested snack to db if it doesn't exist
-                        if not snack.objects.filter(
-                            name=form.cleaned_data['snack_name'],
-                        ).exists():
-                            s = snack(
-                                name=form.cleaned_data['snack_name'],
-                                optional=True,
-                                purchaseLocations=(
-                                    form.cleaned_data['purchase_locations'],
-                                ),
-                                purchaseCount=0,
-                                lastPurchaseDate='Never Purchased',
-                            )
-                            s.save()
-                            msg = 'Your suggestion \'{0}\' has beeen added!'\
-                                .format(form.cleaned_data['snack_name'])
-
-                            messages.success(request, msg)
-
-                            # Decrement suggestions remaining, update cookie
-                            suggestions_remaining -= 1
-                            response = HttpResponseRedirect(reverse('index'))
-                            response.set_cookie(
-                                'suggestions_remaining_cookie',
-                                suggestions_remaining,
-                            )
-                            return response
-
-                        else:
-                            # Handle case where snack is already suggested
-                            msg = '\'{0}\' has already been suggested '\
-                                'for this month.\n'\
-                                'Please suggest a new snack!'\
-                                .format(form.cleaned_data['snack_name'])
-
-                            messages.error(request, msg)
-                            return HttpResponseRedirect(reverse('suggestions'))
-
-                    else:
-                        # Handle case of no suggestion remaining
-                        messages.error(
-                            request, 'You have no more suggestions this month',
-                        )
-                        return HttpResponseRedirect(reverse('index'))
-
+                    
+                # Handle 'suggest a new snack' form
+                elif (
+                    request.POST.get('form_suggestion') and
+                    form.is_valid()
+                ):
+                    return handle_suggestion_form(form, request)
+                    
         # Retrieve number of optional snacks
         choiceCount = len(get_optional_snacks())
 
