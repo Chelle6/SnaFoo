@@ -111,58 +111,44 @@ def handle_suggestion_form(form, request):
         "longitude": -89.5677
     }
 
-    # data = json.dumps(result).encode('utf8')
-    # url = get_url()
-    # req = urllib2.Request(
-    #     url, data, {'Content-Type': 'application/json'}
-    # )
-    # response = urllib2.urlopen(req)
+    data = json.dumps(result).encode('utf8')
+    url = get_url()
+    req = urllib2.Request(
+        url, data, {'Content-Type': 'application/json'}
+    )
+    response = urllib2.urlopen(req)
 
-    # Add suggested snack to db if it doesn't exist
-    if not snack.objects.filter(
+    s = snack(
         name=form.cleaned_data['snack_name'],
-    ).exists():
-        s = snack(
-            name=form.cleaned_data['snack_name'],
-            optional=True,
-            purchaseLocations=(
-                form.cleaned_data['purchase_locations'],
-            ),
-            purchaseCount=0,
-            lastPurchaseDate='Never Purchased',
-        )
-        s.save()
-        msg = 'Your suggestion \'{0}\' has beeen added!'\
-            .format(form.cleaned_data['snack_name'])
+        optional=True,
+        purchaseLocations=(
+            form.cleaned_data['purchase_locations'],
+        ),
+        purchaseCount=0,
+        lastPurchaseDate='Never Purchased',
+    )
+    s.save()
+    msg = 'Your suggestion \'{0}\' has beeen added!'\
+        .format(form.cleaned_data['snack_name'])
 
-        messages.success(request, msg)
+    messages.success(request, msg)
 
-        # Decrement suggestions remaining, update cookie
-        suggestions_remaining -= 1
-        response = HttpResponseRedirect(reverse('index'))
-        response.set_cookie(
-            'suggestions_remaining_cookie',
-            suggestions_remaining,
-        )
-        return response
-
-    else:
-        # Handle case where snack is already suggested
-        msg = '\'{0}\' has already been suggested '\
-            'for this month.\n'\
-            'Please suggest a new snack!'\
-            .format(form.cleaned_data['snack_name'])
-
-        messages.error(request, msg)
-        return HttpResponseRedirect(reverse('suggestions'))
+    # Decrement suggestions remaining, update cookie
+    suggestions_remaining -= 1
+    response = HttpResponseRedirect(reverse('index'))
+    response.set_cookie(
+        'suggestions_remaining_cookie',
+        suggestions_remaining,
+    )
+    return response
 
 
 def suggestions(request):
     global suggestions_remaining
-    # if 'suggestions_remaining_cookie' in request.COOKIES:
-    #     suggestions_remaining = int(
-    #         request.COOKIES['suggestions_remaining_cookie']
-    #     )
+    if 'suggestions_remaining_cookie' in request.COOKIES:
+        suggestions_remaining = int(
+            request.COOKIES['suggestions_remaining_cookie']
+        )
 
     # Retrieve snack item data
     # Get json data from Web API, convert data to Python dictionary if valid

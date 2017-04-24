@@ -31,6 +31,10 @@ thead tr:nth-child(even) {
 	background: #b8c0c1;
 }
 
+error {
+	color: red;
+}
+
 button {
 	background-color: #007d8a; /* Green */
 	border: none;

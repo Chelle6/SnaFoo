@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from inventory.models import snack
 import json
 import urllib
@@ -34,6 +35,14 @@ def get_optional_snacks():
 class SuggestionForm(forms.Form):
     snack_name = forms.CharField(max_length=200)
     purchase_locations = forms.CharField(widget=forms.Textarea, max_length=50)
+
+    def clean_snack_name(self):
+        snack_name = self.cleaned_data['snack_name']
+        if snack.objects.filter(name__iexact=snack_name).exists():
+            msg = '\'{0}\' has already been suggested this month.'\
+            .format(snack_name.title())
+            raise ValidationError(msg)
+        return snack_name
 
 
 class DropdownSelectionForm(forms.Form):

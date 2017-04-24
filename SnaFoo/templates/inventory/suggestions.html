@@ -50,7 +50,12 @@
 	            <th>
 
 			<form action="" method="POST">
-			    {{ form.as_p }}
+			    {% for field in form %}
+		            {% if field.errors %}
+		                <font color='red'>{{ field.errors|striptags }}</font><br>
+	                {% endif %}
+	                {{ field.label_tag }} {{ field }}<br>
+                {% endfor %}
 			    {% csrf_token %}
 			    <input type="submit" value="Suggest" name="form_suggestion" class="button">
 			</form>
